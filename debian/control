@@ -1,0 +1,12 @@
+Source: ros-melodic-mesh-msgs
+Section: misc
+Priority: optional
+Maintainer: Sebastian Pütz <spuetz@uos.de>
+Build-Depends: debhelper (>= 9.0.0), ros-melodic-catkin, ros-melodic-geometry-msgs, ros-melodic-message-generation, ros-melodic-roscpp, ros-melodic-sensor-msgs, ros-melodic-std-msgs
+Homepage: http://wiki.ros.org/ros_mesh_tools/mesh_msgs
+Standards-Version: 3.9.2
+
+Package: ros-melodic-mesh-msgs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-melodic-geometry-msgs, ros-melodic-message-runtime, ros-melodic-roscpp, ros-melodic-sensor-msgs, ros-melodic-std-msgs
+Description: Various Message Types for Mesh Data.
