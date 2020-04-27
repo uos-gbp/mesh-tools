@@ -1,0 +1,12 @@
+Source: ros-melodic-hdf5-map-io
+Section: misc
+Priority: optional
+Maintainer: Sebastian Pütz <spuetz@uos.de>
+Build-Depends: debhelper (>= 9.0.0), libboost-all-dev, libhdf5-dev, ros-melodic-catkin
+Homepage: http://wiki.ros.org/ros_mesh_tools/hdf5_map_io
+Standards-Version: 3.9.2
+
+Package: ros-melodic-hdf5-map-io
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libboost-all-dev, libhdf5-dev
+Description: The hdf5_map_io package
