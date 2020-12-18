@@ -1,0 +1,12 @@
+Source: ros-noetic-mesh-msgs
+Section: misc
+Priority: optional
+Maintainer: Sebastian Pütz <spuetz@uos.de>
+Build-Depends: debhelper (>= 9.0.0), ros-noetic-catkin, ros-noetic-geometry-msgs, ros-noetic-message-generation, ros-noetic-roscpp, ros-noetic-sensor-msgs, ros-noetic-std-msgs
+Homepage: http://wiki.ros.org/ros_mesh_tools/mesh_msgs
+Standards-Version: 3.9.2
+
+Package: ros-noetic-mesh-msgs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-noetic-geometry-msgs, ros-noetic-message-runtime, ros-noetic-roscpp, ros-noetic-sensor-msgs, ros-noetic-std-msgs
+Description: Various Message Types for Mesh Data.
