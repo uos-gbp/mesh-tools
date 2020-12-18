@@ -1,0 +1,12 @@
+Source: ros-noetic-mesh-msgs-conversions
+Section: misc
+Priority: optional
+Maintainer: Sebastian Pütz <spuetz@uos.de>
+Build-Depends: debhelper (>= 9.0.0), ros-noetic-catkin, ros-noetic-lvr2, ros-noetic-mesh-msgs, ros-noetic-roscpp, ros-noetic-sensor-msgs
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-noetic-mesh-msgs-conversions
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-noetic-lvr2, ros-noetic-mesh-msgs, ros-noetic-roscpp, ros-noetic-sensor-msgs
+Description: converts point clouds and attributes into meshes and mesh attributes
