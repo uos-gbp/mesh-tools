@@ -1,0 +1,12 @@
+Source: ros-noetic-rviz-mesh-plugin
+Section: misc
+Priority: optional
+Maintainer: Sebastian Pütz <spuetz@uos.de>
+Build-Depends: debhelper (>= 9.0.0), qtbase5-dev, ros-noetic-catkin, ros-noetic-mesh-msgs, ros-noetic-roscpp, ros-noetic-rviz, ros-noetic-std-msgs, ros-noetic-tf2-ros
+Homepage: http://wiki.ros.org/ros_mesh_tools/rviz_mesh_plugin
+Standards-Version: 3.9.2
+
+Package: ros-noetic-rviz-mesh-plugin
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5core5a, libqt5gui5, libqt5widgets5, ros-noetic-mesh-msgs, ros-noetic-roscpp, ros-noetic-rviz, ros-noetic-std-msgs, ros-noetic-tf2-ros
+Description: RViz display types and tools for the mesh_msgs package.
