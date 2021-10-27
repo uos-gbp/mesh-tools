@@ -1,0 +1,16 @@
+ros-noetic-mesh-msgs-conversions (1.1.0-1focal) focal; urgency=high
+
+  * removed unused messages
+  * resolved catkin lint problems
+
+ -- Sebastian Pütz <spuetz@uos.de>  Tue, 26 Oct 2021 22:00:00 -0000
+
+ros-noetic-mesh-msgs-conversions (1.0.1-1focal) focal; urgency=high
+
+  * fix of static-name bug in LVR2Config.cmake
+  * removed not implemented functions from header
+  * moved lvr_ros conversions to mesh_msgs_conversions
+
+ -- Sebastian Pütz <spuetz@uos.de>  Tue, 10 Nov 2020 23:00:00 -0000
+
+
