@@ -1,3 +1,34 @@
+## mesh_tools (melodic) - 1.1.0-1
+
+The packages in the `mesh_tools` repository were released into the `melodic` distro by running `/usr/bin/bloom-release --rosdistro melodic mesh_tools` on `Wed, 27 Oct 2021 10:12:06 -0000`
+
+These packages were released:
+- `hdf5_map_io`
+- `label_manager`
+- `mesh_msgs`
+- `mesh_msgs_conversions`
+- `mesh_msgs_hdf5`
+- `mesh_msgs_transform`
+- `mesh_tools`
+- `rviz_map_plugin`
+
+Version of package(s) in repository `mesh_tools`:
+
+- upstream repository: https://github.com/uos/mesh_tools.git
+- release repository: https://github.com/uos-gbp/mesh-tools.git
+- rosdistro version: `1.0.1-1`
+- old version: `1.0.1-1`
+- new version: `1.1.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.10.7`
+- catkin_pkg version: `0.4.23`
+- rosdep version: `0.21.0`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## mesh_tools (noetic) - 1.0.1-1
 
 The packages in the `mesh_tools` repository were released into the `noetic` distro by running `/usr/bin/bloom-release mesh_tools --ros-distro noetic` on `Fri, 18 Dec 2020 10:34:39 -0000`
