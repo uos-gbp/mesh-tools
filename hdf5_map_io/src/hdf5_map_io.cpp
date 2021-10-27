@@ -257,32 +257,32 @@ std::vector<uint32_t> HDF5MapIO::getFaceIdsOfLabel(std::string groupName, std::s
 
 std::vector<float> HDF5MapIO::getRoughness()
 {
-    std::vector<float> roughness;
-
-    if (!m_channelsGroup.exist("roughness"))
-    {
-        return roughness;
-    }
-
-    m_channelsGroup.getDataSet("roughness")
-        .read(roughness);
-
-    return roughness;
+    return getVertexCosts("roughness");
 }
 
 std::vector<float> HDF5MapIO::getHeightDifference()
 {
-    std::vector<float> diff;
+    return getVertexCosts("height_diff");
+}
 
-    if (!m_channelsGroup.exist("height_diff"))
+std::vector<float> HDF5MapIO::getVertexCosts(std::string costlayer)
+{
+    std::vector<float> costs;
+
+    if (!m_channelsGroup.exist(costlayer))
     {
-        return diff;
+        return costs;
     }
 
-    m_channelsGroup.getDataSet("height_diff")
-        .read(diff);
+    m_channelsGroup.getDataSet(costlayer)
+        .read(costs);
 
-    return diff;
+    return costs;
+}
+
+std::vector<std::string> HDF5MapIO::getCostLayers()
+{
+    return m_channelsGroup.listObjectNames();
 }
 
 MapImage HDF5MapIO::getImage(hf::Group group, std::string name)
@@ -367,6 +367,29 @@ void HDF5MapIO::addVertexTextureCoords(std::vector<float>& coords)
     m_texturesGroup
         .createDataSet<float>("coords", hf::DataSpace::From(coords))
         .write(coords);
+}
+
+void HDF5MapIO::addOrUpdateLabel(std::string groupName, std::string labelName, std::vector<uint32_t>& faceIds)
+{
+    std::cout << "Add or update label" << std::endl;
+    if (!m_labelsGroup.exist(groupName))
+    {
+        m_labelsGroup.createGroup(groupName);
+    }
+
+    auto group = m_labelsGroup.getGroup(groupName);
+    if(group.exist(labelName))
+    {
+      std::cout << "write to existing label" << std::endl;
+      auto dataset = group.getDataSet(labelName);
+      dataset.write(faceIds);
+    }
+    else
+    {
+      std::cout << "write to new label" << std::endl;
+      auto dataset = group.createDataSet<uint32_t>(labelName, hf::DataSpace::From(faceIds));
+      dataset.write(faceIds);
+    }
 }
 
 void HDF5MapIO::addLabel(std::string groupName, std::string labelName, std::vector<uint32_t>& faceIds)

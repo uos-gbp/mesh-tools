@@ -151,6 +151,16 @@ public:
     std::vector<float> getHeightDifference();
 
     /**
+     * @brief Returns one costlayer as float vector.
+     */
+    std::vector<float> getVertexCosts(std::string costlayer);
+
+    /**
+     * @brief returns the names of all available costlayers
+     */
+    std::vector<std::string> getCostLayers();
+
+    /**
      * @brief Returns the image in the group, if it exists. If not an empty struct is returned
      */
     MapImage getImage(hf::Group group, std::string name);
@@ -185,6 +195,12 @@ public:
      * E.g.: tree_1 -> groupName=tree; labelName=1; separated by the '_'
      */
     void addLabel(std::string groupName, std::string labelName, std::vector<uint32_t>& faceIds);
+
+    /**
+     * @brief Adds or updates the label (labelName) to the label group with the given faces.
+     * E.g.: tree_1 -> groupName=tree; labelName=1; separated by the '_'
+     */
+    void addOrUpdateLabel(std::string groupName, std::string labelName, std::vector<uint32_t>& faceIds);
 
     /**
      * @brief Adds the keypoints with their corresponding positions to the attributes_group. The position
