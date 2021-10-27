@@ -37,18 +37,18 @@
  *
  *
  *
- *  mesh_goal_tool.cpp
+ *  MeshGoalTool.cpp
  *
  *  author: Sebastian Pütz <spuetz@uni-osnabrueck.de>
  */
 
 
-#include "mesh_goal_tool.h"
+#include "MeshGoalTool.hpp"
 
 #include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS( rviz_mesh_plugin::MeshGoalTool, rviz::Tool )
+PLUGINLIB_EXPORT_CLASS( rviz_map_plugin::MeshGoalTool, rviz::Tool )
 
-namespace rviz_mesh_plugin{
+namespace rviz_map_plugin{
 MeshGoalTool::MeshGoalTool()
 {
   shortcut_key_ = 'm';

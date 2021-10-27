@@ -37,71 +37,61 @@
  *
  *
  *
- *  mesh_goal_tool.h
+ *  MeshPoseTool.hpp
  *
  *  author: Sebastian Pütz <spuetz@uni-osnabrueck.de>
  */
 
-#ifndef RVIZ_MESH_PLUGIN__MESH_GOAL_TOOL_H_
-#define RVIZ_MESH_PLUGIN__MESH_GOAL_TOOL_H_
+#ifndef MESH_POSE_TOOL_HPP
+#define MESH_POSE_TOOL_HPP
 
-#include "mesh_pose_tool.h"
-#include <geometry_msgs/PoseStamped.h>
-#include <rviz/properties/bool_property.h>
-#include <rviz/properties/string_property.h>
-#include <rviz/display_context.h>
+#include <OGRE/OgreVector3.h>
+#include <OGRE/OgreQuaternion.h>
+#include <OGRE/OgreManualObject.h>
+#include <OGRE/OgreRay.h>
 
-#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
-#include <QObject>
-#endif
+#include <QCursor>
+#include <ros/ros.h>
+#include <rviz/tool.h>
+#include <rviz/ogre_helpers/arrow.h>
 
-namespace rviz_mesh_plugin{
-
-/**
- * @class MeshGoalTool
- * @brief Tool for publishing a goal within a mesh
- */
-class MeshGoalTool : public MeshPoseTool{
-Q_OBJECT
+namespace rviz_map_plugin
+{
+class MeshPoseTool : public rviz::Tool
+{
 public:
+  MeshPoseTool();
+  virtual ~MeshPoseTool();
 
-    /**
-     * @brief Constructor
-     */
-    MeshGoalTool();
+  virtual void onInitialize();
 
-    /**
-     * @brief Callback that is executed when tool is initialized
-     */
-    virtual void onInitialize();
+  virtual void activate();
+  virtual void deactivate();
 
-private Q_SLOTS:
-
-    /**
-     * @brief Updates the topic on which the goal will be published
-     */
-    void updateTopic();
+  virtual int processMouseEvent(rviz::ViewportMouseEvent& event);
 
 protected:
+  virtual void onPoseSet(const Ogre::Vector3& position, const Ogre::Quaternion& orientation) = 0;
 
-    /**
-     * @brief When goal is set, publish result
-     * @param position Position
-     * @param orientation Orientation
-     */
-    virtual void onPoseSet( const Ogre::Vector3& position, const Ogre::Quaternion& orientation );
+  void getRawManualObjectData(const Ogre::ManualObject* mesh, const size_t sectionNumber, size_t& vertexCount,
+                              Ogre::Vector3*& vertices, size_t& indexCount, unsigned long*& indices);
 
-    /// Property for the topic
-    rviz::StringProperty* topic_property_;
-    /// Switch bottom / top for selection
-    rviz::BoolProperty* switch_bottom_top_;
-    /// Publisher
-    ros::Publisher pose_pub_;
-    /// Node handle
-    ros::NodeHandle nh_;
+  bool getPositionAndOrientation(const Ogre::ManualObject* mesh, const Ogre::Ray& ray, Ogre::Vector3& position,
+                                 Ogre::Vector3& orientation);
 
+  bool selectTriangle(rviz::ViewportMouseEvent& event, Ogre::Vector3& position, Ogre::Vector3& orientation);
+
+  rviz::Arrow* arrow_;
+  enum State
+  {
+    Position,
+    Orientation
+  };
+  State state_;
+  Ogre::Vector3 pos_;
+  Ogre::Vector3 ori_;
 };
 
-} /* namespace rviz_mesh_plugin */
+} /* namespace rviz_map_plugin */
 
-#endif /* mesh_goal_tool.h */
+#endif
