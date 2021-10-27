@@ -2,18 +2,18 @@
  *  Software License Agreement (BSD License)
  *
  *  Robot Operating System code by the University of Osnabrück
- *  Copyright (c) 2015, University of Osnabrück
+ *  Copyright (c) 2021, University of Osnabrück
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *   1. Redistributions of source code must retain the above 
+ *   1. Redistributions of source code must retain the above
  *      copyright notice, this list of conditions and the following
  *      disclaimer.
  *
- *   2. Redistributions in binary form must reproduce the above 
+ *   2. Redistributions in binary form must reproduce the above
  *      copyright notice, this list of conditions and the following
  *      disclaimer in the documentation and/or other materials provided
  *      with the distribution.
@@ -32,31 +32,56 @@
  *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
  *  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
  *  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- *  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ *  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
  *
- *  transforms.h
+ *  RvizFileProperty.cpp
  *
- *  author: Sebastian Pütz <spuetz@uni-osnabrueck.de>
+ *
+ *  authors:
+ *
+ *    Malte kleine Piening <malte@klpiening.de>
  */
 
+#include "RvizFileProperty.hpp"
 
-#ifndef MESH_MSGS_TRANSFORM__TRANSFORMS_H_
-#define MESH_MSGS_TRANSFORM__TRANSFORMS_H_
+#include <QFileDialog>
 
-#include <tf/transform_listener.h>
-#include <mesh_msgs/MeshGeometryStamped.h>
-
-namespace mesh_msgs_transform{
-    bool transformGeometryMeshNoTime(
-        const std::string& target_frame,
-        const mesh_msgs::MeshGeometryStamped& mesh_in,
-        const std::string& fixed_frame,
-        mesh_msgs::MeshGeometryStamped& mesh_out,
-        const tf::TransformListener&  tf_listener
-    );
+namespace rviz
+{
+FileProperty::FileProperty(const QString& name, const QString& default_value, const QString& description,
+                           Property* parent, const char* changed_slot, QObject* receiver)
+  : Property(name, default_value, description, parent, changed_slot, receiver)
+{
 }
 
-#endif /* transforms.h */
+QWidget* FileProperty::createEditor(QWidget* parent, const QStyleOptionViewItem&)
+{
+  QFileDialog* editor = new QFileDialog(nullptr);
+
+  QStringList filenameFilters;
+  filenameFilters << tr("*.h5");
+  filenameFilters << tr("*");
+  editor->setNameFilters(filenameFilters);
+
+  editor->setViewMode(QFileDialog::Detail);
+
+  if (editor->exec())
+  {
+    QStringList fileNames = editor->selectedFiles();
+    if (fileNames.size() == 0)
+    {
+      setStdFilename("");
+    }
+    else
+    {
+      setFilename(fileNames.at(0));
+    }
+  }
+
+  return nullptr;
+}
+
+}  // namespace rviz
