@@ -9,11 +9,11 @@
  *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *   1. Redistributions of source code must retain the above 
+ *   1. Redistributions of source code must retain the above
  *      copyright notice, this list of conditions and the following
  *      disclaimer.
  *
- *   2. Redistributions in binary form must reproduce the above 
+ *   2. Redistributions in binary form must reproduce the above
  *      copyright notice, this list of conditions and the following
  *      disclaimer in the documentation and/or other materials provided
  *      with the distribution.
@@ -32,31 +32,74 @@
  *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
  *  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
  *  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- *  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ *  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
  *
- *  transforms.h
+ *  MeshGoalTool.hpp
  *
  *  author: Sebastian Pütz <spuetz@uni-osnabrueck.de>
  */
 
+#ifndef MESH_GOAL_TOOL_HPP
+#define MESH_GOAL_TOOL_HPP
 
-#ifndef MESH_MSGS_TRANSFORM__TRANSFORMS_H_
-#define MESH_MSGS_TRANSFORM__TRANSFORMS_H_
+#include "MeshPoseTool.hpp"
+#include <geometry_msgs/PoseStamped.h>
+#include <rviz/properties/bool_property.h>
+#include <rviz/properties/string_property.h>
+#include <rviz/display_context.h>
 
-#include <tf/transform_listener.h>
-#include <mesh_msgs/MeshGeometryStamped.h>
+#ifndef Q_MOC_RUN
+#include <QObject>
+#endif
 
-namespace mesh_msgs_transform{
-    bool transformGeometryMeshNoTime(
-        const std::string& target_frame,
-        const mesh_msgs::MeshGeometryStamped& mesh_in,
-        const std::string& fixed_frame,
-        mesh_msgs::MeshGeometryStamped& mesh_out,
-        const tf::TransformListener&  tf_listener
-    );
-}
+namespace rviz_map_plugin
+{
+/**
+ * @class MeshGoalTool
+ * @brief Tool for publishing a goal within a mesh
+ */
+class MeshGoalTool : public MeshPoseTool
+{
+  Q_OBJECT
+public:
+  /**
+   * @brief Constructor
+   */
+  MeshGoalTool();
 
-#endif /* transforms.h */
+  /**
+   * @brief Callback that is executed when tool is initialized
+   */
+  virtual void onInitialize();
+
+private Q_SLOTS:
+
+  /**
+   * @brief Updates the topic on which the goal will be published
+   */
+  void updateTopic();
+
+protected:
+  /**
+   * @brief When goal is set, publish result
+   * @param position Position
+   * @param orientation Orientation
+   */
+  virtual void onPoseSet(const Ogre::Vector3& position, const Ogre::Quaternion& orientation);
+
+  /// Property for the topic
+  rviz::StringProperty* topic_property_;
+  /// Switch bottom / top for selection
+  rviz::BoolProperty* switch_bottom_top_;
+  /// Publisher
+  ros::Publisher pose_pub_;
+  /// Node handle
+  ros::NodeHandle nh_;
+};
+
+} /* namespace rviz_map_plugin */
+
+#endif
