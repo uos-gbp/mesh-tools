@@ -42,19 +42,24 @@
  *
  *  authors:
  *
+ *    Sebastian Pütz <spuetz@uni-osnabrueck.de>
+ *    Henning Deeken <hdeeken@uni-osnabrueck.de>
+ *    Marcel Mrozinski
+ *    Nils Oesting
  *    Kristin Schmidt <krschmidt@uni-osnabrueck.de>
  *    Jan Philipp Vogtherr <jvogtherr@uni-osnabrueck.de>
+ *    Malte kleine Piening <malte@klpiening.de>
  */
-
 
 #ifndef MESH_DISPLAY_HPP
 #define MESH_DISPLAY_HPP
 
 #include <Types.hpp>
-#include <TexturedMeshVisual.hpp>
+#include <MeshVisual.hpp>
 
 #include <vector>
 #include <memory>
+#include <queue>
 
 #include <string>
 #include <math.h>
@@ -76,6 +81,12 @@
 #include <rviz/display.h>
 
 #ifndef Q_MOC_RUN
+#include <message_filters/subscriber.h>
+#include <message_filters/time_synchronizer.h>
+#include <message_filters/cache.h>
+
+#include <tf2_ros/message_filter.h>
+
 #include <rviz/mesh_loader.h>
 
 #include <OGRE/OgreManualObject.h>
@@ -89,165 +100,379 @@
 
 namespace rviz
 {
-
 // Forward declaration
 class BoolProperty;
 class ColorProperty;
 class FloatProperty;
 class IntProperty;
+class RosTopicProperty;
 class EnumProperty;
 class StringProperty;
 
-} // End namespace rviz
+}  // End namespace rviz
 
 namespace rviz_map_plugin
 {
-
 using std::shared_ptr;
-using std::unique_ptr;
 using std::string;
+using std::unique_ptr;
 using std::vector;
 
 // Forward declaration
-class TexturedMeshVisual;
-
+class MeshVisual;
 
 /**
  * @class MeshDisplay
  * @brief Display for showing the mesh in different modes
  */
-class MeshDisplay: public rviz::Display
+class MeshDisplay : public rviz::Display
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
+  /**
+   * @brief Constructor
+   */
+  MeshDisplay();
 
-    /**
-     * @brief Constructor
-     */
-    MeshDisplay();
+  /**
+   * @brief Destructor
+   */
+  ~MeshDisplay();
 
-    /**
-     * @brief Destructor
-     */
-    ~MeshDisplay();
+  /**
+   * @brief RViz callback on enable
+   */
+  void onEnable();
 
-    /**
-     * @brief Set the geometry
-     * @param geometry The geometry
-     */
-    void setGeometry(shared_ptr<Geometry> geometry);
+  /**
+   * @brief RViz callback on disable
+   */
+  void onDisable();
 
-    /**
-     * @brief Set the vertex colors
-     * @param vertexColors The vertex colors
-     */
-    void setVertexColors(vector<Color>& vertexColors);
+  /**
+   * @brief Set the topics to subscribe.
+   */
+  void subscribe();
 
-    /**
-     * @brief Set the vertex normals
-     * @param vertexNormals The vertex normals
-     */
-    void setVertexNormals(vector<Normal>& vertexNormals);
+  /**
+   * @brief Unsubscribes all topics.
+   */
+  void unsubscribe();
 
-    /**
-     * @brief Set the materials and texture coordinates
-     * @param materials The materials
-     * @param texCoords The texture coordinates
-     */
-    void setMaterials(vector<Material>& materials, vector<TexCoords>& texCoords);
+  /**
+   * @brief disables visualization of incoming messages
+   *
+   * When called, incoming mesh messages will be ignored and the rviz properties to set topics and services will be
+   * hidden. This cloud be useful when using this display as a child-display e.g. of the MapDisplay
+   */
+  void ignoreIncomingMessages();
 
-    /**
-     * @brief Add a texture
-     * @param texture The texture
-     * @param textureIndex The textures index
-     */
-    void addTexture(Texture& texture, uint32_t textureIndex);
+  /**
+   * @brief Set the geometry
+   * @param geometry The geometry
+   */
+  void setGeometry(shared_ptr<Geometry> geometry);
 
-    /**
-     * @brief RViz callback on enable
-     */
-    void onEnable();
+  /**
+   * @brief Set the vertex colors
+   * @param vertexColors The vertex colors
+   */
+  void setVertexColors(vector<Color>& vertexColors);
 
-    /**
-     * @brief RViz callback on disable
-     */
-    void onDisable();
+  /**
+   * @brief Clears the vertex costs
+   */
+  void clearVertexCosts();
+
+  /**
+   * @brief Adds a vertex costlayer
+   * @param costlayer Name of the new costlayer
+   * @param vertexCosts The vertex costs
+   */
+  void addVertexCosts(std::string costlayer, vector<float>& vertexCosts);
+
+  /**
+   * @brief Set the vertex normals
+   * @param vertexNormals The vertex normals
+   */
+  void setVertexNormals(vector<Normal>& vertexNormals);
+
+  /**
+   * @brief Set the materials and texture coordinates
+   * @param materials The materials
+   * @param texCoords The texture coordinates
+   */
+  void setMaterials(vector<Material>& materials, vector<TexCoords>& texCoords);
+
+  /**
+   * @brief Add a texture
+   * @param texture The texture
+   * @param textureIndex The textures index
+   */
+  void addTexture(Texture& texture, uint32_t textureIndex);
+
+  /**
+   * @brief Set geometrys pose
+   * @param position position of the pose
+   * @param orientation orientation of the pose
+   */
+  void setPose(Ogre::Vector3& position, Ogre::Quaternion& orientation);
 
 private Q_SLOTS:
 
-    /**
-     * @brief Updates the mesh
-     */
-    void updateMesh();
+  /**
+   * @brief Updates the buffer size
+   */
+  void updateBufferSize();
 
-    /**
-     * @brief Updates the mesh wireframe
-     */
-    void updateWireframe();
+  /**
+   * @brief Updates the mesh
+   */
+  void updateMesh();
 
-    /**
-     * @brief Update the mesh normals
-     */
-    void updateNormals();
+  /**
+   * @brief Updates the mesh wireframe
+   */
+  void updateWireframe();
+
+  /**
+   * @brief Update the mesh normals
+   */
+  void updateNormals();
+
+  /**
+   * @brief Update the color of the mesh normals
+   */
+  void updateNormalsColor();
+
+  /**
+   * @brief Update the size of the mesh normals
+   */
+  void updateNormalsSize();
+
+  /**
+   * @brief Update the vertex costs
+   */
+  void updateVertexCosts();
+
+  /**
+   * @brief Updates the subscribed vertex colors topic.
+   */
+  void updateVertexColorsTopic();
+
+  /**
+   * @brief Updates the subscribed vertex costs topic.
+   */
+  void updateVertexCostsTopic();
+
+  /**
+   * @brief Updates the subscribed topic.
+   */
+  void updateTopic();
+
+  /**
+   * @brief Updates the vertex color service.
+   */
+  void updateVertexColorService();
+
+  /**
+   * @brief Updates the material and texture services.
+   */
+  void updateMaterialAndTextureServices();
 
 private:
+  /**
+   * @brief RViz callback on initialize
+   */
+  void onInitialize();
 
-    /**
-     * @brief RViz callback on initialize
-     */
-    void onInitialize();
+  /**
+   * @brief initial service call for UUID & geometry
+   */
+  void initialServiceCall();
 
-    /// Geometry data
-    shared_ptr<Geometry> m_geometry;
+  /**
+   * @brief Sets data for trianglemesh_visual and updates the mesh.
+   * @param meshMsg Message containing geometry information
+   */
+  void processMessage(const mesh_msgs::MeshGeometryStamped::ConstPtr& meshMsg);
 
-    /// Visual data
-    shared_ptr<TexturedMeshVisual> m_visual;
+  /**
+   * @brief Handler for incoming geometry messages. Validate data and update mesh
+   * @param meshMsg The geometry
+   */
+  void incomingGeometry(const mesh_msgs::MeshGeometryStamped::ConstPtr& meshMsg);
 
-    /// Property to set wireframe color
-    rviz::ColorProperty* m_wireframeColor;
+  /**
+   * @brief Handler for incoming vertex color messages. Validate data and update mesh
+   * @param colorsStamped The vertex colors
+   */
+  void incomingVertexColors(const mesh_msgs::MeshVertexColorsStamped::ConstPtr& colorsStamped);
 
-    /// Property to set wireframe transparency
-    rviz::FloatProperty* m_wireframeAlpha;
+  /**
+   * @brief Handler for incoming vertex cost messages. Validate data and update mesh
+   * @param costsStamped The vertex costs
+   */
+  void incomingVertexCosts(const mesh_msgs::MeshVertexCostsStamped::ConstPtr& costsStamped);
 
-    /// Property to set faces color
-    rviz::ColorProperty* m_facesColor;
+  /**
+   * @brief Requests vertex colors from the specified service
+   * @param uuid Mesh UUID
+   */
+  void requestVertexColors(std::string uuid);
 
-    /// Property to set faces transparency
-    rviz::FloatProperty* m_facesAlpha;
+  /**
+   * @brief Requests materials from the specified service
+   * @param uuid Mesh UUID
+   */
+  void requestMaterials(std::string uuid);
 
-    /// Property to use the vertex colors
-    rviz::BoolProperty* m_facesVertexColors;
+  /**
+   * @brief Cache function for vertex cost messages.
+   * @param costsStamped The vertex cost message
+   */
+  void cacheVertexCosts(std::string layer, const std::vector<float>& costs);
 
-    /// Property to use the triangle colors
-    rviz::BoolProperty* m_facesTriangleColors;
+  /**
+   * @brief delivers the latest mesh visual
+   * @return latest mesh visual
+   */
+  std::shared_ptr<MeshVisual> getLatestVisual();
 
-    /// Property to set the size of the normals
-    rviz::FloatProperty* m_scalingFactor;
+  /**
+   * @brief adds a new visual to the ring buffer
+   * @return newly added visual
+   */
+  std::shared_ptr<MeshVisual> addNewVisual();
 
-    /// Property to set the color of the normals
-    rviz::ColorProperty* m_normalsColor;
+  /// if set to true, ignore incoming messages and do not use services to request materials
+  bool m_ignoreMsgs;
 
-    /// Property to set the transparency of the normals
-    rviz::FloatProperty* m_normalsAlpha;
+  /// Client to request the vertex colors
+  ros::ServiceClient m_vertexColorClient;
 
-    /// Property to select the display type
-    rviz::EnumProperty* m_displayType;
+  /// Client to request the materials
+  ros::ServiceClient m_materialsClient;
 
-    /// Property to select the wireframe
-    rviz::BoolProperty* m_showWireframe;
+  /// Client to request the textures
+  ros::ServiceClient m_textureClient;
 
-    /// Property to select the normals
-    rviz::BoolProperty* m_showNormals;
+  /// Client to request the UUID
+  ros::ServiceClient m_uuidClient;
 
-    /// Property to only show textured faces when texturizing is enabled
-    rviz::BoolProperty* m_showTexturedFacesOnly;
+  /// Client to request the geometry
+  ros::ServiceClient m_geometryClient;
 
-    /// Will be set to true once the initial data has arrived
-    bool has_data = false;
+  /// Subscriber for meshMsg
+  message_filters::Subscriber<mesh_msgs::MeshGeometryStamped> m_meshSubscriber;
 
+  /// Subscriber for vertex colors
+  message_filters::Subscriber<mesh_msgs::MeshVertexColorsStamped> m_vertexColorsSubscriber;
+
+  /// Subscriber for vertex costs
+  message_filters::Subscriber<mesh_msgs::MeshVertexCostsStamped> m_vertexCostsSubscriber;
+
+  /// Messagefilter for meshMsg
+  tf2_ros::MessageFilter<mesh_msgs::MeshGeometryStamped>* m_tfMeshFilter;
+
+  /// Messagefilter for vertex colors
+  tf2_ros::MessageFilter<mesh_msgs::MeshVertexColorsStamped>* m_tfVertexColorsFilter;
+
+  /// Messagefilter for vertex costs
+  tf2_ros::MessageFilter<mesh_msgs::MeshVertexCostsStamped>* m_tfVertexCostsFilter;
+
+  /// Synchronizer for meshMsgs
+  message_filters::Cache<mesh_msgs::MeshGeometryStamped>* m_meshSynchronizer;
+
+  /// Synchronizer for vertex colors
+  message_filters::Cache<mesh_msgs::MeshVertexColorsStamped>* m_colorsSynchronizer;
+
+  /// Synchronizer for vertex costs
+  message_filters::Cache<mesh_msgs::MeshVertexCostsStamped>* m_costsSynchronizer;
+
+  /// Counter for the received messages
+  uint32_t m_messagesReceived;
+
+  /// Uuid of the last received message
+  std::string m_lastUuid;
+
+  /// Visual data
+  std::queue<std::shared_ptr<MeshVisual>> m_visuals;
+
+  /// Property to handle topic for meshMsg
+  rviz::RosTopicProperty* m_meshTopic;
+
+  /// Property to handle buffer size
+  rviz::IntProperty* m_bufferSize;
+
+  /// Property to select the display type
+  rviz::EnumProperty* m_displayType;
+
+  /// Property to set faces color
+  rviz::ColorProperty* m_facesColor;
+
+  /// Property to set faces transparency
+  rviz::FloatProperty* m_facesAlpha;
+
+  /// Property to handle topic for vertex colors
+  rviz::RosTopicProperty* m_vertexColorsTopic;
+
+  /// Property to handle service name for vertexColors
+  rviz::StringProperty* m_vertexColorServiceName;
+
+  /// Property to only show textured faces when texturizing is enabled
+  rviz::BoolProperty* m_showTexturedFacesOnly;
+
+  /// Property to handle service name for materials
+  rviz::StringProperty* m_materialServiceName;
+
+  /// Property to handle service name for textures
+  rviz::StringProperty* m_textureServiceName;
+
+  /// Property for selecting the color type for cost display
+  rviz::EnumProperty* m_costColorType;
+
+  /// Property to handle topic for vertex cost maps
+  rviz::RosTopicProperty* m_vertexCostsTopic;
+
+  /// Property to select different types of vertex cost maps to be shown
+  rviz::EnumProperty* m_selectVertexCostMap;
+
+  /// Property for using custom limits for cost display
+  rviz::BoolProperty* m_costUseCustomLimits;
+
+  /// Property for setting the lower limit of cost display
+  rviz::FloatProperty* m_costLowerLimit;
+
+  /// Property for setting the upper limit of cost display
+  rviz::FloatProperty* m_costUpperLimit;
+
+  /// Property to select the normals
+  rviz::BoolProperty* m_showNormals;
+
+  /// Property to set the color of the normals
+  rviz::ColorProperty* m_normalsColor;
+
+  /// Property to set the transparency of the normals
+  rviz::FloatProperty* m_normalsAlpha;
+
+  /// Property to set the size of the normals
+  rviz::FloatProperty* m_scalingFactor;
+
+  /// Property to select the wireframe
+  rviz::BoolProperty* m_showWireframe;
+
+  /// Property to set wireframe color
+  rviz::ColorProperty* m_wireframeColor;
+
+  /// Property to set wireframe transparency
+  rviz::FloatProperty* m_wireframeAlpha;
+
+  /// Cache for received vertex cost messages
+  std::map<std::string, std::vector<float>> m_costCache;
 };
 
-} // end namespace rviz_map_plugin
+}  // end namespace rviz_map_plugin
 
 #endif
