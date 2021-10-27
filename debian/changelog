@@ -1,0 +1,21 @@
+ros-melodic-mesh-msgs-hdf5 (1.1.0-1bionic) bionic; urgency=high
+
+  * added publishing of mesh_msgs to mesh_msgs_hdf5 package
+  * fixed hdf5 to mesh_msgs publisher node
+  * resolved catkin lint problems
+
+ -- Sebastian Pütz <spuetz@uos.de>  Tue, 26 Oct 2021 22:00:00 -0000
+
+ros-melodic-mesh-msgs-hdf5 (1.0.1-1bionic) bionic; urgency=high
+
+
+
+ -- Sebastian Pütz <spuetz@uos.de>  Tue, 10 Nov 2020 23:00:00 -0000
+
+ros-melodic-mesh-msgs-hdf5 (1.0.0-1bionic) bionic; urgency=high
+
+  * release version 1.0.0
+
+ -- Sebastian Pütz <spuetz@uos.de>  Sat, 25 Apr 2020 22:00:00 -0000
+
+
