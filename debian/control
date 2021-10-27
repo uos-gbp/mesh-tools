@@ -1,0 +1,12 @@
+Source: ros-noetic-mesh-msgs-hdf5
+Section: misc
+Priority: optional
+Maintainer: Sebastian Pütz <spuetz@uos.de>
+Build-Depends: debhelper (>= 9.0.0), ros-noetic-catkin, ros-noetic-hdf5-map-io, ros-noetic-label-manager, ros-noetic-mesh-msgs
+Homepage: http://wiki.ros.org/ros_mesh_tools/mesh_msgs_hdf5
+Standards-Version: 3.9.2
+
+Package: ros-noetic-mesh-msgs-hdf5
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-noetic-hdf5-map-io, ros-noetic-label-manager, ros-noetic-mesh-msgs
+Description: Read mesh_msgs from hdf5
