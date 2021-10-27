@@ -1,0 +1,24 @@
+ros-noetic-hdf5-map-io (1.1.0-1focal) focal; urgency=high
+
+  * added publishing of mesh_msgs to mesh_msgs_hdf5 package
+  * fixed mpi error
+  * resolved catkin lint problems
+  * update label in hdf5 file
+
+ -- Sebastian Pütz <spuetz@uos.de>  Tue, 26 Oct 2021 22:00:00 -0000
+
+ros-noetic-hdf5-map-io (1.0.1-1focal) focal; urgency=high
+
+  * fix: find_library lvr2, since this is missing in LVR2Config.cmake
+  * use new hdf5 structure compatible to the datasets in https://github.com/uos/pluto_robot
+  * use HighFive from lvr2, add lvr2 as dependency and removed HighFive gitmodule definition
+
+ -- Sebastian Pütz <spuetz@uos.de>  Tue, 10 Nov 2020 23:00:00 -0000
+
+ros-noetic-hdf5-map-io (1.0.0-1focal) focal; urgency=high
+
+  * release version 1.0.0
+
+ -- Sebastian Pütz <spuetz@uos.de>  Sat, 25 Apr 2020 22:00:00 -0000
+
+
